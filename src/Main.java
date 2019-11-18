@@ -24,7 +24,7 @@ public class Main {
     private static void writeUsingOutputStream(String data) {
         OutputStream os = null;
         try {
-            os = new FileOutputStream(new File("./KB.txt"));
+            os = new FileOutputStream(new File("./KB.pl"));
             os.write(data.getBytes(), 0, data.length());
         } catch (IOException e) {
             e.printStackTrace();
