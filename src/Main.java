@@ -25,12 +25,12 @@ public class Main {
             os = new FileOutputStream(new File("./KB.pl"));
 
             StringBuilder outString = new StringBuilder();
-            outString.append("im("+ix+","+iy+")."+"\n" );
+            outString.append("im("+ix+","+iy+","+"s0"+")."+"\n" );
             int c=1;
             for (int i = 0; i < stonesIndices.length; i = i + 2) {
                 int x = Integer.parseInt(stonesIndices[i] + "");
                 int y = Integer.parseInt(stonesIndices[i+1] + "");
-                outString.append("s"+c+"("+x+","+y+")."+"\n" );
+                outString.append("s"+c+"("+x+","+y+","+"s0"+")."+"\n" );
                 c++;
             }
             outString.append("t("+tx+","+ty+")."+"\n" );

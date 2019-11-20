@@ -1,5 +1,5 @@
-:- [kb1].
-% :- [kb2].
+% :- [kb1].
+:- [kb2].
 action(right, 0, 1).
 action(left, 0, -1).
 action(down, 1, 0).
@@ -24,11 +24,11 @@ delMember(X, [X|Xs], Y) :- !, delMember(X, Xs, Y).
 delMember(X, [T|Xs], Y) :- !, delMember(X, Xs, Y2), append([T], Y2, Y).
 
 snap([[snap|S],[collect|S4],[collect|S3],[collect|S2],[collect|S1]]):-
-    im(Q,W),
-    s1(X1,Y1), x(X1,Y1,Q,W,S1),
-    s2(X2,Y2), x(X2,Y2,X1,Y1,S2),
-    s3(X3,Y3), x(X3,Y3,X2,Y2,S3),
-    s4(X4,Y4), x(X4,Y4,X3,Y3,S4),
+    im(Q,W,s0),
+    s1(X1,Y1,s0), x(X1,Y1,Q,W,S1),
+    s2(X2,Y2,s0), x(X2,Y2,X1,Y1,S2),
+    s3(X3,Y3,s0), x(X3,Y3,X2,Y2,S3),
+    s4(X4,Y4,s0), x(X4,Y4,X3,Y3,S4),
     t(X,Y), x(X,Y,X4,Y4,S).
 
 snapped(S):-
@@ -46,10 +46,3 @@ iterative_deepening(T, L, R):-
     call_with_depth_limit(T, L, R), (R\='depth_limit_exceeded').
 iterative_deepening(T, L, 'depth_limit_exceeded'):-
     N is L+1, iterative_deepening(T, N, R).
-
-
-% TODO:
-% 1- generate grid
-% 2- add collect
-% 3- apply valid move
-% 4- edit snap
