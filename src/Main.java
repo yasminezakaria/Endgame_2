@@ -17,15 +17,27 @@ public class Main {
         int tx = Integer.parseInt(tSplit[0] + "");
         int ty = Integer.parseInt(tSplit[1] + "");
         String[] stonesIndices = gridSplit[3].split(",");
-        for (int i = 0; i < stonesIndices.length; i = i + 2) {
-//ADD Stones here
-        }
+        writeUsingOutputStream(m, n, ix, iy, tx, ty, stonesIndices);
     }
-    private static void writeUsingOutputStream(String data) {
+    private static void writeUsingOutputStream(int m, int n, int ix, int iy, int tx, int ty, String[] stonesIndices) {
         OutputStream os = null;
         try {
             os = new FileOutputStream(new File("./KB.pl"));
-            os.write(data.getBytes(), 0, data.length());
+
+            StringBuilder outString = new StringBuilder();
+            outString.append("im("+ix+","+iy+")."+"\n" );
+            int c=1;
+            for (int i = 0; i < stonesIndices.length; i = i + 2) {
+                int x = Integer.parseInt(stonesIndices[i] + "");
+                int y = Integer.parseInt(stonesIndices[i+1] + "");
+                outString.append("s"+c+"("+x+","+y+")."+"\n" );
+                c++;
+            }
+            outString.append("t("+tx+","+ty+")."+"\n" );
+            outString.append("m("+m+")."+"\n" );
+            outString.append("n("+n+")."+"\n" );
+            os.write(outString.toString().getBytes(), 0, outString.length());
+
         } catch (IOException e) {
             e.printStackTrace();
         }finally{
@@ -37,6 +49,7 @@ public class Main {
         }
     }
     public static void main(String[] args) {
-
+        //GenGrid ("5,5;1,2;3,4;1,1,2,1,2,2,3,3");
+        GenGrid ("5,5;1,2;3,4;0,0,2,1,0,4,3,3");
     }
 }

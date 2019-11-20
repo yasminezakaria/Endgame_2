@@ -1,44 +1,55 @@
-im(1,2,s0).
-s(1,1,s0).
-s(2,1,s0).
-s(2,2,s0).
-s(3,3,s0).
-t(3,4).
-m(5).
-n(5).
-
+:- [kb1].
+% :- [kb2].
 action(right, 0, 1).
 action(left, 0, -1).
 action(down, 1, 0).
 action(up, -1, 0).
 
 ingrid(X,Y):- m(I), X < I, X>=0, n(J), Y < J, Y>=0.
-valid_move(X,Y,A):-
-    action(A,DX, DY), NX is X + DX, NY is Y + DY, m(I), NX < I, NX>=0, n(J), NY < J, NY>=0.
-im(X,Y,result(A,S)):-
-    % valid_move(X,Y,a),action(a, DX, DY), NX is X + DX, NY is Y + DY, im(NX, NY, S).
-    % valid_move(X,Y,A),
-    ingrid(X,Y), action(A, DX, DY), NX is X - DX, NY is Y - DY, im(NX, NY, S).
-% , call_with_depth_limit(snapped(S), 100, R)
+
+format([],s0).
+format([A|T],result(A,S)):-
+    format(T,S).
+
+flatten2([], []) :- !.
+flatten2([L|Ls], FlatL) :-
+    !,
+    flatten2(L, NewL),
+    flatten2(Ls, NewLs),
+    append(NewL, NewLs, FlatL).
+flatten2(L, [L]).
+
+delMember(X, [], []) :- !.
+delMember(X, [X|Xs], Y) :- !, delMember(X, Xs, Y).
+delMember(X, [T|Xs], Y) :- !, delMember(X, Xs, Y2), append([T], Y2, Y).
+
+snap([[snap|S],[collect|S4],[collect|S3],[collect|S2],[collect|S1]]):-
+    im(Q,W),
+    s1(X1,Y1), x(X1,Y1,Q,W,S1),
+    s2(X2,Y2), x(X2,Y2,X1,Y1,S2),
+    s3(X3,Y3), x(X3,Y3,X2,Y2,S3),
+    s4(X4,Y4), x(X4,Y4,X3,Y3,S4),
+    t(X,Y), x(X,Y,X4,Y4,S).
+
 snapped(S):-
-    t(X,Y), im(X,Y,S).
+    iterative_deepening(snap(K), 1, R),
+    flatten2(K,L),
+    delMember(constant,L,M),
+    format(M,S).
 
+x(X,Y,X,Y,constant).
+x(X,Y,C,B,[T|A]):-
+    ingrid(X,Y),
+    action(A, DX, DY), NX is X - DX, NY is Y - DY, x(NX, NY, C, B, T).
 
-iterative_deepening(snapped(S), L, 'depth_limit_exceeded'):-
-    N is L+1, call_with_depth_limit(snapped(S), N, R).
-iterative_deepening(snapped(S), L, R):-
-    call_with_depth_limit(snapped(S), L, R), \+(R=='depth_limit_exceeded').
-    % N is L+1, iterative_deepening(snapped(S), N, R).
+iterative_deepening(T, L, R):-
+    call_with_depth_limit(T, L, R), (R\='depth_limit_exceeded').
+iterative_deepening(T, L, 'depth_limit_exceeded'):-
+    N is L+1, iterative_deepening(T, N, R).
 
-
-% The argument R of the call_with_depth limit predicate is bound to depth_limit_exceeded 
-% when no solution is found within the specified depth. 
-% You need to write a recursive predicate that calls call_with_depth_limit with the limit 1 and then check on R. 
-% If R is not depth_limit_exceeded, then you stop the recursion. 
-% Otherwise, you increment the limit and call the same predicate again with the new limit.
 
 % TODO:
-% 1- add iterative deepening from link in piazza
+% 1- generate grid
 % 2- add collect
 % 3- apply valid move
 % 4- edit snap
