@@ -25,14 +25,14 @@ public class Main {
             os = new FileOutputStream(new File("./KB.pl"));
 
             StringBuilder outString = new StringBuilder();
-            outString.append("im("+ix+","+iy+","+"s0"+")."+"\n" );
-            int c=1;
+            outString.append("im("+ix+","+iy+",[");
             for (int i = 0; i < stonesIndices.length; i = i + 2) {
                 int x = Integer.parseInt(stonesIndices[i] + "");
                 int y = Integer.parseInt(stonesIndices[i+1] + "");
-                outString.append("s"+c+"("+x+","+y+","+"s0"+")."+"\n" );
-                c++;
+                outString.append("["+x+","+y+"]," );
             }
+            outString.deleteCharAt(outString.lastIndexOf(","));
+            outString.append("],"+"s0"+")."+"\n");
             outString.append("t("+tx+","+ty+")."+"\n" );
             outString.append("m("+m+")."+"\n" );
             outString.append("n("+n+")."+"\n" );
@@ -47,9 +47,5 @@ public class Main {
                 e.printStackTrace();
             }
         }
-    }
-    public static void main(String[] args) {
-        //GenGrid ("5,5;1,2;3,4;1,1,2,1,2,2,3,3");
-        GenGrid ("5,5;1,2;3,4;0,0,2,1,0,4,3,3");
     }
 }

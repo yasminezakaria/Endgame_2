@@ -1,47 +1,37 @@
-% :- [kb1].
-:- [kb2].
-action(right, 0, 1).
+% Load Knowledge base and lists library
+:- include(kb2).
+:- use_module(library(lists)).
+
+% Movement actions available definitions
 action(left, 0, -1).
+action(right, 0, 1).
 action(down, 1, 0).
 action(up, -1, 0).
 
+% ingrid(X,Y) is true if the given position X,Y is not out of grid borders
 ingrid(X,Y):- m(I), X < I, X>=0, n(J), Y < J, Y>=0.
 
-format([],s0).
-format([A|T],result(A,S)):-
-    format(T,S).
-
-flatten2([], []) :- !.
-flatten2([L|Ls], FlatL) :-
-    !,
-    flatten2(L, NewL),
-    flatten2(Ls, NewLs),
-    append(NewL, NewLs, FlatL).
-flatten2(L, [L]).
-
+% delMember(X,Y,Z) is true if the given element X is not in the output list Z but in list Y
 delMember(X, [], []) :- !.
 delMember(X, [X|Xs], Y) :- !, delMember(X, Xs, Y).
 delMember(X, [T|Xs], Y) :- !, delMember(X, Xs, Y2), append([T], Y2, Y).
 
-snap([[snap|S],[collect|S4],[collect|S3],[collect|S2],[collect|S1]]):-
-    im(Q,W,s0),
-    s1(X1,Y1,s0), x(X1,Y1,Q,W,S1),
-    s2(X2,Y2,s0), x(X2,Y2,X1,Y1,S2),
-    s3(X3,Y3,s0), x(X3,Y3,X2,Y2,S3),
-    s4(X4,Y4,s0), x(X4,Y4,X3,Y3,S4),
-    t(X,Y), x(X,Y,X4,Y4,S).
+% Successor-state axiom for ironman including all actions except snap
+im(X, Y, OLDSTONES, result(A, S)):-
+    ingrid(X, Y),
+    (action(A, DX, DY), NX is X - DX, NY is Y - DY, im(NX, NY,OLDSTONES,S));
+    (COLLECTEDSTONES = [X,Y], A = collect, im(X , Y, [COLLECTEDSTONES|OLDSTONES], S)).
 
+% snap_helper (S) is true if ironman collected all stones and reached Thanos position then snapped
+snap_helper(result(snap,S)):-
+    t(X,Y),
+    im(X,Y,[],S).
+
+% snapped(S) is true if the output of the snap_helper is true after doing iterative deepening
 snapped(S):-
-    iterative_deepening(snap(K), 1, R),
-    flatten2(K,L),
-    delMember(constant,L,M),
-    format(M,S).
+    iterative_deepening(snap_helper(S), 16, R).
 
-x(X,Y,X,Y,constant).
-x(X,Y,C,B,[T|A]):-
-    ingrid(X,Y),
-    action(A, DX, DY), NX is X - DX, NY is Y - DY, x(NX, NY, C, B, T).
-
+% iterative_deepening(T, L, R) is true if target predicate T is executed with depth limit L and R not equal to depth_limit_exceeded
 iterative_deepening(T, L, R):-
     call_with_depth_limit(T, L, R), (R\='depth_limit_exceeded').
 iterative_deepening(T, L, 'depth_limit_exceeded'):-
